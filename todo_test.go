@@ -1,12 +1,16 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/essentier/testutil"
+)
 
 func TestTodoRestAPI(t *testing.T) {
 	t.Parallel()
 	t.Logf("done")
-	// todoService := testutil.CreateRestService("todo-rest", t)
-	// defer todoService.Release() // This will also release the mongodb service.
+	todoService := testutil.CreateRestService("todo-rest", t)
+	defer todoService.Release() // This will also release the mongodb service.
 
 	// hostUrl := "http://" + todoService.IP + ":" + strconv.Itoa(todoService.Port)
 	// log.Printf("host url: %v", hostUrl)
