@@ -7,12 +7,18 @@ import (
 
 	"github.com/codegangsta/negroni"
 	"github.com/essentier/spickspan"
+	"github.com/essentier/spickspan/config"
 	"github.com/essentier/spickspan/model"
 	"github.com/rs/cors"
 )
 
 func getServiceProvider() (model.Provider, error) {
-	registry, err := spickspan.GetDefaultKubeRegistry()
+	config, err := config.GetConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	registry, err := spickspan.GetDefaultKubeRegistry(config)
 	if err != nil {
 		return nil, err
 	}
