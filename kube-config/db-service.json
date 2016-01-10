@@ -1,0 +1,22 @@
+{
+   "kind":"Service",
+   "apiVersion":"v1",
+   "metadata":{
+      "name":"todo-rest-db",
+      "labels":{
+         "name":"todo-rest-db"
+      }
+   },
+   "spec":{
+      "ports": [
+        {
+          "port":27017,
+          "targetPort":27017,
+          "protocol":"TCP"
+        }
+      ],
+      "selector":{
+         "name":"todo-rest-db"
+      }
+   }
+}

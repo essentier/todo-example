@@ -1,0 +1,37 @@
+{
+   "kind":"ReplicationController",
+   "apiVersion":"v1",
+   "metadata":{
+      "name":"todo-rest",
+      "labels":{
+         "name":"todo-rest"
+      }
+   },
+   "spec":{
+      "replicas":2,
+      "selector":{
+         "name":"todo-rest"
+      },
+      "template":{
+         "metadata":{
+            "labels":{
+               "name":"todo-rest"
+            }
+         },
+         "spec":{
+            "containers":[
+               {
+                  "name":"todo-rest-api",
+                  "image":"10.20.132.228:5000/nomock/todo-rest:latest",
+                  "ports":[
+                     {
+                        "containerPort":5000,
+                        "protocol":"TCP"
+                     }
+                  ]
+               }
+            ]
+         }
+      }
+   }
+}

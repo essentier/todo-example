@@ -1,0 +1,6 @@
+todo:
+  links:
+  - mongo
+
+mongo:
+  image: mongo
