@@ -7,8 +7,18 @@ import (
 
 	"github.com/codegangsta/negroni"
 	"github.com/essentier/spickspan"
+	"github.com/essentier/spickspan/model"
 	"github.com/rs/cors"
 )
+
+func getServiceProvider() (model.Provider, error) {
+	registry, err := spickspan.GetDefaultKubeRegistry()
+	if err != nil {
+		return nil, err
+	}
+
+	return registry.ResolveProvider()
+}
 
 func main() {
 	n := negroni.Classic()
@@ -20,8 +30,7 @@ func main() {
 	})
 	n.Use(c)
 
-	registry := spickspan.GetDefaultKubeRegistry()
-	provider, err := registry.ResolveProvider()
+	provider, err := getServiceProvider()
 	if err != nil {
 		log.Fatalf("Could not resolve spickspan provider. The error is %v", err)
 		return
