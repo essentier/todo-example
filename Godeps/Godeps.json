@@ -25,7 +25,7 @@
 		},
 		{
 			"ImportPath": "github.com/essentier/spickspan",
-			"Rev": "dc2166d95f4cf2d115f78c35a870ca922856a02d"
+			"Rev": "693035c94ee1c24b049aaaf76a58e9ca7132b612"
 		},
 		{
 			"ImportPath": "github.com/essentier/testutil",

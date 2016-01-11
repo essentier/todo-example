@@ -22,7 +22,6 @@ const (
 // }
 
 func BuildAllInConfig(config config.Model) error {
-	log.Printf("build all in config")
 	return servicebuilder.BuildAllInConfig(config)
 }
 
