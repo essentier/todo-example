@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"testing"
-	"time"
 
 	"github.com/essentier/spickspan"
 	"github.com/essentier/testutil"
@@ -45,12 +44,11 @@ func TestTodoRestAPI(t *testing.T) {
 	defer todoService.Release() // This will also release the mongodb service.
 
 	log.Printf("host url: %v", todoService.Service.GetUrl())
-	serviceReady := spickspan.WaitService(todoService.Service)
+	serviceReady := spickspan.ProbeService(todoService.Service, "/todos")
 	if serviceReady {
 		log.Printf("service is ready")
 	}
 
-	time.Sleep(5000 * time.Millisecond)
 	var createdTodo todo.Todo
 	newTodo := todo.Todo{Name: "todo1", Completed: false}
 	todoService.Resource("todos").Post(newTodo, &createdTodo)

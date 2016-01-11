@@ -25,7 +25,7 @@
 		},
 		{
 			"ImportPath": "github.com/essentier/spickspan",
-			"Rev": "693035c94ee1c24b049aaaf76a58e9ca7132b612"
+			"Rev": "8d481483a7a34562f02041e12d9e79549aaf0743"
 		},
 		{
 			"ImportPath": "github.com/essentier/testutil",
@@ -42,10 +42,6 @@
 		{
 			"ImportPath": "github.com/gorilla/mux",
 			"Rev": "47e8f450ef38c857cdd922ec08862ca9d65a1c6d"
-		},
-		{
-			"ImportPath": "github.com/rs/cors",
-			"Rev": "5e4ce6bc0ecd3472f6f943666d84876691be2ced"
 		},
 		{
 			"ImportPath": "gopkg.in/mgo.v2",
