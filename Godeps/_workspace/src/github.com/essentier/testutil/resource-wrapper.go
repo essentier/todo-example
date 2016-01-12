@@ -7,119 +7,90 @@ import (
 	"github.com/essentier/gopencils"
 )
 
-type ResWrapper struct {
-	Resource   *gopencils.Resource
-	ErrHandler RestErrorHandler
+type resourceWrapper struct {
+	resource   *gopencils.Resource
+	errHandler RestErrorHandler
 }
 
-// Creates a new Resource.
-func (rw *ResWrapper) NewChildResource(resourceName string) *ResWrapper {
-	newRes := rw.Resource.NewChildResource(resourceName, nil)
-	newRW := &ResWrapper{ErrHandler: rw.ErrHandler, Resource: newRes}
+func (rw *resourceWrapper) NewChildResource(resourceName string) *resourceWrapper {
+	newRes := rw.resource.NewChildResource(resourceName, nil)
+	newRW := &resourceWrapper{errHandler: rw.errHandler, resource: newRes}
 	return newRW
 }
 
-// Same as Res() Method, but returns a Resource with url resource/:id
-func (rw *ResWrapper) NewChildIdResource(id string) *ResWrapper {
-	newRes := rw.Resource.NewChildIdResource(id)
-	newRW := &ResWrapper{ErrHandler: rw.ErrHandler, Resource: newRes}
+func (rw *resourceWrapper) NewChildIdResource(id string) *resourceWrapper {
+	newRes := rw.resource.NewChildIdResource(id)
+	newRW := &resourceWrapper{errHandler: rw.errHandler, resource: newRes}
 	return newRW
 }
 
-// Sets QueryValues for current Resource
-func (rw *ResWrapper) SetQuery(querystring map[string]string) *ResWrapper {
-	rw.Resource.SetQuery(querystring)
+func (rw *resourceWrapper) SetQuery(querystring map[string]string) *resourceWrapper {
+	rw.resource.SetQuery(querystring)
 	return rw
 }
 
-// Performs a GET request on given Resource
-// Call SetQuery beforehand if you want to set the query string of the GET request.
-func (rw *ResWrapper) Get(responseBody interface{}) *ResWrapper {
-	rw.Resource.Response = responseBody
-	_, err := rw.Resource.Get()
-	if rw.ErrHandler != nil {
-		rw.ErrHandler.HandleError(err, "REST GET failed.")
+func (rw *resourceWrapper) Get(responseBody interface{}) *resourceWrapper {
+	rw.resource.Response = responseBody
+	_, err := rw.resource.Get()
+	rw.handleErrorIfAny(err, "REST GET failed.")
+	return rw
+}
+
+func (rw *resourceWrapper) Head() *resourceWrapper {
+	_, err := rw.resource.Head()
+	rw.handleErrorIfAny(err, "REST HEAD failed.")
+	return rw
+}
+
+func (rw *resourceWrapper) Put(payload interface{}, responseBody interface{}) *resourceWrapper {
+	rw.resource.Response = responseBody
+	_, err := rw.resource.Put(payload)
+	rw.handleErrorIfAny(err, "REST PUT failed.")
+	return rw
+}
+
+func (rw *resourceWrapper) handleErrorIfAny(err error, message string) {
+	if err != nil && rw.errHandler != nil {
+		rw.errHandler.HandleError(err, message)
 	}
+}
+
+func (rw *resourceWrapper) Post(payload interface{}, responseBody interface{}) *resourceWrapper {
+	rw.resource.Response = responseBody
+	_, err := rw.resource.Post(payload)
+	rw.handleErrorIfAny(err, "REST POST failed.")
 	return rw
 }
 
-// Performs a HEAD request on given Resource
-// Call SetQuery beforehand if you want to set the query string of the HEAD request.
-func (rw *ResWrapper) Head() *ResWrapper {
-	_, err := rw.Resource.Head()
-	if rw.ErrHandler != nil {
-		rw.ErrHandler.HandleError(err, "REST HEAD failed.")
-	}
+func (rw *resourceWrapper) Delete(responseBody interface{}) *resourceWrapper {
+	rw.resource.Response = responseBody
+	_, err := rw.resource.Delete()
+	rw.handleErrorIfAny(err, "REST DELETE failed.")
 	return rw
 }
 
-// Performs a PUT request on given Resource.
-// Accepts interface{} as parameter, will be used as payload.
-func (rw *ResWrapper) Put(payload interface{}, responseBody interface{}) *ResWrapper {
-	rw.Resource.Response = responseBody
-	_, err := rw.Resource.Put(payload)
-	if rw.ErrHandler != nil {
-		rw.ErrHandler.HandleError(err, "REST PUT failed.")
-	}
+func (rw *resourceWrapper) Options(responseBody interface{}) *resourceWrapper {
+	rw.resource.Response = responseBody
+	_, err := rw.resource.Options()
+	rw.handleErrorIfAny(err, "REST OPTIONS failed.")
 	return rw
 }
 
-// Performs a POST request on given Resource.
-// Accepts interface{} as parameter, will be used as payload.
-func (rw *ResWrapper) Post(payload interface{}, responseBody interface{}) *ResWrapper {
-	rw.Resource.Response = responseBody
-	_, err := rw.Resource.Post(payload)
-	if rw.ErrHandler != nil {
-		rw.ErrHandler.HandleError(err, "REST POST failed.")
-	}
+func (rw *resourceWrapper) Patch(payload interface{}, responseBody interface{}) *resourceWrapper {
+	rw.resource.Response = responseBody
+	_, err := rw.resource.Patch(payload)
+	rw.handleErrorIfAny(err, "REST PATCH failed.")
 	return rw
 }
 
-// Performs a Delete request on given Resource.
-// Call SetQuery beforehand if you want to set the query string of the DELETE request.
-func (rw *ResWrapper) Delete(responseBody interface{}) *ResWrapper {
-	rw.Resource.Response = responseBody
-	_, err := rw.Resource.Delete()
-	if rw.ErrHandler != nil {
-		rw.ErrHandler.HandleError(err, "REST DELETE failed.")
-	}
-	return rw
+func (rw *resourceWrapper) SetPayload(args interface{}) io.Reader {
+	return rw.resource.SetPayload(args)
 }
 
-// Performs a OPTIONS request on given Resource.
-// Call SetQuery beforehand if you want to set the query string of the OPTIONS request.
-func (rw *ResWrapper) Options(responseBody interface{}) *ResWrapper {
-	rw.Resource.Response = responseBody
-	_, err := rw.Resource.Options()
-	if rw.ErrHandler != nil {
-		rw.ErrHandler.HandleError(err, "REST OPTIONS failed.")
-	}
-	return rw
+func (rw *resourceWrapper) SetHeader(key string, value string) {
+	rw.resource.SetHeader(key, value)
 }
 
-// Performs a PATCH request on given Resource.
-// Accepts interface{} as parameter, will be used as payload.
-func (rw *ResWrapper) Patch(payload interface{}, responseBody interface{}) *ResWrapper {
-	rw.Resource.Response = responseBody
-	_, err := rw.Resource.Patch(payload)
-	if rw.ErrHandler != nil {
-		rw.ErrHandler.HandleError(err, "REST PATCH failed.")
-	}
-	return rw
-}
-
-// Sets Payload for current Resource
-func (rw *ResWrapper) SetPayload(args interface{}) io.Reader {
-	return rw.Resource.SetPayload(args)
-}
-
-// Sets Headers
-func (rw *ResWrapper) SetHeader(key string, value string) {
-	rw.Resource.SetHeader(key, value)
-}
-
-// Overwrites the client that will be used for requests.
-// For example if you want to use your own client with OAuth2
-func (rw *ResWrapper) SetClient(c *http.Client) {
-	rw.Resource.SetClient(c)
+func (rw *resourceWrapper) SetClient(c *http.Client) {
+	rw.resource.SetClient(c)
 }

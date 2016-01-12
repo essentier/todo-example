@@ -4,12 +4,14 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
+
+	"github.com/go-errors/errors"
 
 	"github.com/codegangsta/negroni"
 	"github.com/essentier/spickspan"
 	"github.com/essentier/spickspan/config"
 	"github.com/essentier/spickspan/model"
+	"github.com/essentier/spickspan/probe"
 )
 
 func getServiceProvider() (model.Provider, error) {
@@ -26,41 +28,38 @@ func getServiceProvider() (model.Provider, error) {
 	return registry.ResolveProvider()
 }
 
-func main() {
-	n := negroni.Classic()
-	// c := cors.New(cors.Options{
-	// 	AllowedOrigins:   []string{"*"},
-	// 	AllowCredentials: true,
-	// 	AllowedMethods:   []string{"GET", "PUT", "DELETE", "POST"},
-	// 	AllowedHeaders:   []string{"Cache-Control", "Pragma", "Origin", "Authorization", "Content-Type", "Accept", "X-Requested-With"},
-	// })
-	// n.Use(c)
+func getDBService(provider model.Provider) (model.Service, error) {
+	mgoService, err := provider.GetService("todo-rest-db")
+	if err != nil {
+		return mgoService, err
+	}
 
+	serviceReady := probe.ProbeMgoService(mgoService)
+	if serviceReady {
+		return mgoService, nil
+	} else {
+		return mgoService, errors.Errorf("Service is not ready yet. The service is %v", mgoService)
+	}
+}
+
+func main() {
 	provider, err := getServiceProvider()
 	if err != nil {
 		log.Fatalf("Could not resolve spickspan provider. The error is %v", err)
 		return
 	}
 
-	mgoService, _ := provider.GetService("todo-rest-db")
-
-	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
-	log.Printf("mgo url: %v", mgoUrl)
-	serviceReady := spickspan.WaitService(mgoService)
-	if serviceReady {
-		log.Printf("service is ready")
+	mgoService, err := getDBService(provider)
+	if err != nil {
+		log.Fatalf("Could not get DB service. The error is %v", err)
+		return
 	}
 
+	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
+	n := negroni.Classic()
 	n.Use(mongoMiddleware(mgoUrl, "tododb"))
 	router := initRoutes()
 	n.UseHandler(router)
-	time.Sleep(15000 * time.Millisecond)
-
-	log.Printf("Listening on port 5000**bb")
-	err = http.ListenAndServe(":5000", n)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("Stopping...")
+	log.Printf("Listening on port 5000")
+	log.Fatal(http.ListenAndServe(":5000", n))
 }
