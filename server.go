@@ -6,12 +6,15 @@ import (
 	"strconv"
 
 	"github.com/go-errors/errors"
+	"github.com/gorilla/mux"
 
 	"github.com/codegangsta/negroni"
 	"github.com/essentier/spickspan"
 	"github.com/essentier/spickspan/config"
 	"github.com/essentier/spickspan/model"
 	"github.com/essentier/spickspan/probe"
+	"github.com/essentier/todo-example/db"
+	"github.com/essentier/todo-example/todo"
 )
 
 func getServiceProvider() (model.Provider, error) {
@@ -42,6 +45,12 @@ func getDBService(provider model.Provider) (model.Service, error) {
 	}
 }
 
+func initRoutes() *mux.Router {
+	router := mux.NewRouter()
+	todo.SetRoutes(router)
+	return router
+}
+
 func main() {
 	provider, err := getServiceProvider()
 	if err != nil {
@@ -57,7 +66,7 @@ func main() {
 
 	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
 	n := negroni.Classic()
-	n.Use(mongoMiddleware(mgoUrl, "tododb"))
+	n.Use(db.MongoMiddleware(mgoUrl, "tododb"))
 	router := initRoutes()
 	n.UseHandler(router)
 	log.Printf("Listening on port 5000")

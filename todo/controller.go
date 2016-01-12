@@ -6,12 +6,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/essentier/todo-example/util"
+	"github.com/essentier/todo-example/db"
 	"gopkg.in/mgo.v2/bson"
 )
 
 func GetTodos(w http.ResponseWriter, r *http.Request) {
-	db := util.GetDB(r)
+	db := db.GetDB(r)
 	var todos Todos
 	db.C("todo").Find(bson.M{}).All(&todos)
 	log.Printf("To dos: %#v", todos)
@@ -36,7 +36,7 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 	u.Id = bson.NewObjectId()
 
 	// Write the user to mongo
-	db := util.GetDB(r)
+	db := db.GetDB(r)
 	db.C("todo").Insert(u)
 
 	// Marshal provided interface into JSON structure

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"testing"
 
 	"github.com/essentier/testutil"
@@ -19,5 +18,5 @@ func TestTodoRestAPI(t *testing.T) {
 
 	var allTodos todo.Todos
 	todoService.Resource("todos").Get(&allTodos)
-	log.Printf("todos are: %#v", allTodos)
+	t.Logf("todos are: %#v", allTodos)
 }
