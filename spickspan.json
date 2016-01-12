@@ -6,11 +6,11 @@
         "password": "Cauchy@1789"
     },
     "services": {
-        "todo-rest-db": {
+        "todo-db": {
         	"container_image": "mongo",
             "port": 27017
         },
-        "todo-rest": {
+        "todo-example": {
             "protocol": "http",
             "project_src_root": ".",
             "port": 5000

@@ -9,7 +9,7 @@ import (
 
 func TestTodoRestAPI(t *testing.T) {
 	t.Parallel()
-	todoService := testutil.CreateRestService("todo-rest", "/todos", t)
+	todoService := testutil.CreateRestService("todo-example", "/todos", t)
 	defer todoService.Release() // This will also release the mongodb service.
 
 	var createdTodo todo.Todo
