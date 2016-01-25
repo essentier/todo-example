@@ -13,30 +13,38 @@ import (
 	"github.com/essentier/todo-example/todo"
 )
 
+const (
+	dbName    = "tododb"
+	dbService = "todo-db"
+)
+
+func main() {
+	provider, err := spickspan.GetDefaultServiceProvider()
+	handleError("Failed to get spickspan provider.", err)
+
+	mgoService, err := spickspan.GetMongoDBService(provider, dbService)
+	handleError("Failed to get MongoDB service.", err)
+
+	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
+	dbMiddleware, err := db.CreateDBMiddleware(mgoUrl, dbName)
+	handleError("Failed to create DB middleware.", err)
+
+	n := negroni.Classic()
+	n.Use(dbMiddleware)
+	router := initRoutes()
+	n.UseHandler(router)
+	log.Printf("Listening on port 5000")
+	log.Fatal(http.ListenAndServe(":5000", n))
+}
+
 func initRoutes() *mux.Router {
 	router := mux.NewRouter()
 	todo.SetRoutes(router)
 	return router
 }
 
-func main() {
-	provider, err := spickspan.GetDefaultServiceProvider()
+func handleError(msg string, err error) {
 	if err != nil {
 		log.Fatalf("Could not resolve spickspan provider. The error is %v", err)
-		return
 	}
-
-	mgoService, err := spickspan.GetMongoDBService(provider, "todo-db")
-	if err != nil {
-		log.Fatalf("Could not get DB service. The error is %v", err)
-		return
-	}
-
-	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
-	n := negroni.Classic()
-	n.Use(db.MongoMiddleware(mgoUrl, "tododb"))
-	router := initRoutes()
-	n.UseHandler(router)
-	log.Printf("Listening on port 5000")
-	log.Fatal(http.ListenAndServe(":5000", n))
 }

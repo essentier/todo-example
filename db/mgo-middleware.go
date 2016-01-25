@@ -5,46 +5,50 @@ import (
 	"time"
 
 	"github.com/codegangsta/negroni"
+	"github.com/go-errors/errors"
 	"github.com/gorilla/context"
 	"gopkg.in/mgo.v2"
 )
 
 type key int
 
-const DB_KEY key = 0
+const (
+	DB_KEY        key = 0
+	dbDialTimeout     = 100 * time.Second
+)
 
-//an example url is 127.0.0.1:27017
-func MongoMiddleware(url string, database string) negroni.HandlerFunc {
+type mgoDBMiddleware struct {
+	session  *mgo.Session
+	database string
+}
+
+func (h *mgoDBMiddleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	reqSession := h.session.Clone()
+	defer reqSession.Close()
+	db := reqSession.DB(h.database)
+	context.Set(r, DB_KEY, db)
+	next(rw, r)
+}
+
+func CreateDBMiddleware(url string, database string) (negroni.Handler, error) {
 	dialInfo, err := mgo.ParseURL(url)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	dialInfo.FailFast = false
-	dialInfo.Timeout = 100 * time.Second
-
+	dialInfo.Timeout = dbDialTimeout
 	session, err := mgo.DialWithInfo(dialInfo)
-
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-
-	return negroni.HandlerFunc(func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-		reqSession := session.Clone()
-		defer reqSession.Close()
-		db := reqSession.DB(database)
-		setDb(r, db)
-		next(rw, r)
-	})
+	return &mgoDBMiddleware{session: session, database: database}, nil
 }
 
-func setDb(r *http.Request, val *mgo.Database) {
-	context.Set(r, DB_KEY, val)
-}
-
-func GetDB(r *http.Request) *mgo.Database {
+func GetDB(r *http.Request) (*mgo.Database, error) {
 	if rv := context.Get(r, DB_KEY); rv != nil {
-		return rv.(*mgo.Database)
+		return rv.(*mgo.Database), nil
+	} else {
+		return nil, errors.Errorf("Database object for the request is not in the context .")
 	}
-	return nil
 }
