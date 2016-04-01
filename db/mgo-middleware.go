@@ -10,6 +10,8 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+type EntityId string
+
 type key int
 
 const (

@@ -45,6 +45,6 @@ func initRoutes() *mux.Router {
 
 func handleError(msg string, err error) {
 	if err != nil {
-		log.Fatalf("Could not resolve spickspan provider. The error is %v", err)
+		log.Fatalf("%v The error is %v", msg, err)
 	}
 }
