@@ -1,25 +1,28 @@
 package todo
 
 import (
-	"os"
-	"strconv"
 	"testing"
-	"time"
 
-	"gopkg.in/mgo.v2"
-
-	"github.com/essentier/spickspan"
+	"github.com/essentier/testutil"
+	"github.com/essentier/todo-example/db"
 )
 
-func tSaveNew(t *testing.T) {
+func TestSaveNew(t *testing.T) {
 	//t.Parallel()
-	originalVal := os.Getenv("SPICKSPAN_MODE")
-	defer os.Setenv("SPICKSPAN_MODE", originalVal)
-	os.Setenv("SPICKSPAN_MODE", "local")
+	// originalVal := os.Getenv("SPICKSPAN_MODE")
+	// defer os.Setenv("SPICKSPAN_MODE", originalVal)
+	// os.Setenv("SPICKSPAN_MODE", "local")
 
-	repo, dbSession := getRepo(t)
+	// repo, dbSession := getRepo(t)
+	// defer dbSession.Close()
+
+	mgoService := testutil.CreateMgoService("todo-db", t)
+	dbSession, err := db.CreateDBSession(mgoService.GetUrl())
+	handleFatalError(t, "Failed to create DB session.", err)
 	defer dbSession.Close()
 
+	db := dbSession.DB("tododb")
+	repo := getRepository(db)
 	todo := Todo{Name: "todo1", Completed: false}
 	savedTodo, err := repo.saveNew(todo)
 	handleFatalError(t, "Failed to find todo by ID.", err)
@@ -31,33 +34,22 @@ func tSaveNew(t *testing.T) {
 	}
 }
 
-func getRepo(t *testing.T) (repository, *mgo.Session) {
-	provider, err := spickspan.GetDefaultServiceProvider()
-	handleFatalError(t, "Failed to get spickspan provider.", err)
+// func getRepo(t *testing.T) (repository, *mgo.Session) {
+// 	provider, err := spickspan.GetDefaultServiceProvider()
+// 	handleFatalError(t, "Failed to get spickspan provider.", err)
 
-	mgoService, err := spickspan.GetMongoDBService(provider, "todo-db")
-	handleFatalError(t, "Failed to get MongoDB service.", err)
+// 	mgoService, err := spickspan.GetMongoDBService(provider, "todo-db")
+// 	handleFatalError(t, "Failed to get MongoDB service.", err)
 
-	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
-	dbSession, err := createDBSession(mgoUrl)
-	handleFatalError(t, "Failed to create DB session.", err)
+// 	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
+// 	dbSession, err := createDBSession(mgoUrl)
+// 	handleFatalError(t, "Failed to create DB session.", err)
 
-	reqSession := dbSession.Clone()
-	db := reqSession.DB("tododb")
-	repo := getRepository(db)
-	return repo, reqSession
-}
-
-func createDBSession(url string) (*mgo.Session, error) {
-	dialInfo, err := mgo.ParseURL(url)
-	if err != nil {
-		return nil, err
-	}
-
-	dialInfo.FailFast = false
-	dialInfo.Timeout = 100 * time.Second
-	return mgo.DialWithInfo(dialInfo)
-}
+// 	reqSession := dbSession.Clone()
+// 	db := reqSession.DB("tododb")
+// 	repo := getRepository(db)
+// 	return repo, reqSession
+// }
 
 func handleFatalError(t *testing.T, message string, err error) {
 	if err != nil {

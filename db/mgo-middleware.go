@@ -33,6 +33,14 @@ func (h *mgoDBMiddleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, nex
 }
 
 func CreateDBMiddleware(url string, database string) (negroni.Handler, error) {
+	session, err := CreateDBSession(url)
+	if err != nil {
+		return nil, err
+	}
+	return &mgoDBMiddleware{session: session, database: database}, nil
+}
+
+func CreateDBSession(url string) (*mgo.Session, error) {
 	dialInfo, err := mgo.ParseURL(url)
 	if err != nil {
 		return nil, err
@@ -40,11 +48,7 @@ func CreateDBMiddleware(url string, database string) (negroni.Handler, error) {
 
 	dialInfo.FailFast = false
 	dialInfo.Timeout = dbDialTimeout
-	session, err := mgo.DialWithInfo(dialInfo)
-	if err != nil {
-		return nil, err
-	}
-	return &mgoDBMiddleware{session: session, database: database}, nil
+	return mgo.DialWithInfo(dialInfo)
 }
 
 func GetDB(r *http.Request) (*mgo.Database, error) {
