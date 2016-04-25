@@ -11,7 +11,7 @@ import (
 	"github.com/essentier/spickspan"
 )
 
-func TestSaveNew(t *testing.T) {
+func tSaveNew(t *testing.T) {
 	//t.Parallel()
 	originalVal := os.Getenv("SPICKSPAN_MODE")
 	defer os.Setenv("SPICKSPAN_MODE", originalVal)
