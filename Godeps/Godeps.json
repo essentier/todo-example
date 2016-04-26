@@ -29,7 +29,7 @@
 		},
 		{
 			"ImportPath": "github.com/essentier/testutil",
-			"Rev": "cb245c0149b5936fad50e3d94cc7f2baf8d00c83"
+			"Rev": "2514157a9beca489aa4762cf81af29b96a142941"
 		},
 		{
 			"ImportPath": "github.com/go-errors/errors",
