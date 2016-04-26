@@ -24,6 +24,10 @@
 			"Rev": "53804fc71812f3a8ae3dc32a3fa15fd745b8ee03"
 		},
 		{
+			"ImportPath": "github.com/essentier/servicebuilder",
+			"Rev": "77365f8e99e9160e51f8ee554fa5ec03fe262072"
+		},
+		{
 			"ImportPath": "github.com/essentier/spickspan",
 			"Rev": "0d68b918096e41a7c473d1b38598a23be67c4602"
 		},
