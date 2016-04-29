@@ -20,6 +20,10 @@
 			"Rev": "3fbee41dde3bf1bef56627fea955714c2f387fe2"
 		},
 		{
+			"ImportPath": "github.com/essentier/negronimgo",
+			"Rev": "b98b4550c75e412f3980395c58836a28a97d08ca"
+		},
+		{
 			"ImportPath": "github.com/essentier/nomockutil",
 			"Rev": "53804fc71812f3a8ae3dc32a3fa15fd745b8ee03"
 		},

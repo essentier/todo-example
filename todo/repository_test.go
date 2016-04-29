@@ -3,15 +3,15 @@ package todo
 import (
 	"testing"
 
+	"github.com/essentier/negronimgo"
 	"github.com/essentier/testutil"
-	"github.com/essentier/todo-example/db"
 )
 
 func TestSaveNew(t *testing.T) {
 	t.Parallel()
 	mgoService := testutil.CreateMgoService("todo-db", t)
 	defer mgoService.Release()
-	dbSession, err := db.CreateDBSession(mgoService.GetUrl())
+	dbSession, err := negronimgo.CreateDBSession(mgoService.GetUrl())
 	handleFatalError(t, "Failed to create DB session.", err)
 	defer dbSession.Close()
 

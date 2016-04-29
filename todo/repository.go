@@ -1,7 +1,6 @@
 package todo
 
 import (
-	"github.com/essentier/todo-example/db"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -9,8 +8,8 @@ import (
 type repository interface {
 	getAll() (Todos, error)
 	saveNew(todo Todo) (Todo, error)
-	removeById(id db.EntityId) error
-	findById(id db.EntityId) (Todo, error)
+	removeById(id EntityId) error
+	findById(id EntityId) (Todo, error)
 }
 
 type repositoryImpl struct {
@@ -27,17 +26,17 @@ func (repo *repositoryImpl) getAll() (Todos, error) {
 	return todos, err
 }
 
-func (repo *repositoryImpl) removeById(id db.EntityId) error {
+func (repo *repositoryImpl) removeById(id EntityId) error {
 	return repo.c.RemoveId(id)
 }
 
 func (repo *repositoryImpl) saveNew(todo Todo) (Todo, error) {
-	todo.Id = db.EntityId(bson.NewObjectId())
+	todo.Id = EntityId(bson.NewObjectId())
 	err := repo.c.Insert(todo)
 	return todo, err
 }
 
-func (repo *repositoryImpl) findById(id db.EntityId) (Todo, error) {
+func (repo *repositoryImpl) findById(id EntityId) (Todo, error) {
 	var todo Todo
 	err := repo.c.Find(bson.M{"_id": id}).One(&todo)
 	return todo, err

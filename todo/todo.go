@@ -1,16 +1,16 @@
 package todo
 
-import "github.com/essentier/todo-example/db"
-
 // type Entity interface {
 // 	SetId(id db.EntityId)
 // 	GetId() db.EntityId
 // }
 
+type EntityId string
+
 type Todo struct {
-	Id        db.EntityId `json:"id" bson:"_id"`
-	Name      string      `json:"name"`
-	Completed bool        `json:"completed"`
+	Id        EntityId `json:"id" bson:"_id"`
+	Name      string   `json:"name"`
+	Completed bool     `json:"completed"`
 }
 
 // func (todo *Todo) SetId(id db.EntityId) {

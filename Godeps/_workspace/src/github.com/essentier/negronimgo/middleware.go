@@ -1,4 +1,4 @@
-package db
+package negronimgo
 
 import (
 	"net/http"
@@ -9,8 +9,6 @@ import (
 	"github.com/gorilla/context"
 	"gopkg.in/mgo.v2"
 )
-
-type EntityId string
 
 type key int
 

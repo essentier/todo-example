@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/essentier/negronimgo"
 	"github.com/essentier/nomockutil"
-	"github.com/essentier/todo-example/db"
 )
 
 func GetTodos(w http.ResponseWriter, r *http.Request) {
-	db, err := db.GetDB(r)
+	db, err := negronimgo.GetDB(r)
 	if err != nil {
 		nomockutil.WriteError(http.StatusInternalServerError, w, err)
 		return
@@ -21,7 +21,7 @@ func GetTodos(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateTodo(w http.ResponseWriter, r *http.Request) {
-	db, err := db.GetDB(r)
+	db, err := negronimgo.GetDB(r)
 	if err != nil {
 		nomockutil.WriteError(http.StatusInternalServerError, w, err)
 		return

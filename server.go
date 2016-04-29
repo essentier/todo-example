@@ -8,8 +8,8 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/codegangsta/negroni"
+	"github.com/essentier/negronimgo"
 	"github.com/essentier/spickspan"
-	"github.com/essentier/todo-example/db"
 	"github.com/essentier/todo-example/todo"
 )
 
@@ -26,7 +26,7 @@ func main() {
 	handleError("Failed to get MongoDB service.", err)
 
 	mgoUrl := mgoService.IP + ":" + strconv.Itoa(mgoService.Port)
-	dbMiddleware, err := db.CreateDBMiddleware(mgoUrl, dbName)
+	dbMiddleware, err := negronimgo.CreateDBMiddleware(mgoUrl, dbName)
 	handleError("Failed to create DB middleware.", err)
 
 	n := negroni.Classic()
